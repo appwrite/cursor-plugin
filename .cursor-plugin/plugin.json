@@ -1,7 +1,7 @@
 {
     "name": "appwrite-plugin",
     "version": "0.1.0",
-    "description": "Appwrite is an open-source backend as a service server that abstracts and simplifies complex and repetitive development tasks behind a very simple to use REST API. Appwrite aims to help you develop your apps faster and in a more secure way. Use the CursorPlugin SDK to integrate your app with the Appwrite server to easily start interacting with all of Appwrite backend APIs and tools. For full API documentation and tutorials go to [https://appwrite.io/docs](https://appwrite.io/docs)",
+    "description": "The Appwrite plugin for Cursor includes skills and MCP servers, allowing AI agents to access your projects and correctly integrate with your projects.",
     "author": {
         "name": "Appwrite",
         "email": "team@appwrite.io"
