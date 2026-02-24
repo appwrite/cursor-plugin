@@ -7,5 +7,5 @@
         "email": "team@appwrite.io"
     },
     "repository": "https://github.com/appwrite/cursor-plugin",
-    "logo": "https://appwrite.io/images/logos/logo.svg"
+    "logo": "logo.svg"
 }
