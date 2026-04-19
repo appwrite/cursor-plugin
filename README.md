@@ -1,7 +1,7 @@
 # Appwrite Cursor Plugin
 
 ![License](https://img.shields.io/github/license/appwrite/cursor-plugin.svg?style=flat-square)
-![Version](https://img.shields.io/badge/api%20version-1.8.1-blue.svg?style=flat-square)
+![Version](https://img.shields.io/badge/api%20version-latest-blue.svg?style=flat-square)
 [![Twitter Account](https://img.shields.io/twitter/follow/appwrite?color=00acee&label=twitter&style=flat-square)](https://twitter.com/appwrite)
 [![Discord](https://img.shields.io/discord/564160730845151244?label=discord&style=flat-square)](https://appwrite.io/discord)
 
@@ -35,6 +35,8 @@ skills/                      # Agent skills (per language)
 │   └── SKILL.md
 ├── appwrite-go/
 │   └── SKILL.md
+├── appwrite-rust/
+│   └── SKILL.md
 ├── appwrite-dotnet/
 │   └── SKILL.md
 commands/                    # Agent-executable commands
@@ -55,6 +57,7 @@ This plugin includes Appwrite SDK skills for the following languages:
 - **Python** — `skills/appwrite-python/SKILL.md`
 - **Ruby** — `skills/appwrite-ruby/SKILL.md`
 - **Go** — `skills/appwrite-go/SKILL.md`
+- **Rust** — `skills/appwrite-rust/SKILL.md`
 - **Dotnet** — `skills/appwrite-dotnet/SKILL.md`
 
 Each skill provides comprehensive SDK usage examples including authentication, database operations, file storage, real-time subscriptions, and more.
