@@ -1,11 +1,11 @@
 # Appwrite Cursor Plugin
 
 ![License](https://img.shields.io/github/license/appwrite/cursor-plugin.svg?style=flat-square)
-![Version](https://img.shields.io/badge/api%20version-latest-blue.svg?style=flat-square)
+![Version](https://img.shields.io/badge/api%20version-1.9.x-blue.svg?style=flat-square)
 [![Twitter Account](https://img.shields.io/twitter/follow/appwrite?color=00acee&label=twitter&style=flat-square)](https://twitter.com/appwrite)
 [![Discord](https://img.shields.io/discord/564160730845151244?label=discord&style=flat-square)](https://appwrite.io/discord)
 
-**This SDK is compatible with Appwrite server version latest. For older versions, please check [previous releases](https://github.com/appwrite/cursor-plugin.git/releases).**
+**This SDK is compatible with Appwrite server version 1.9.x. For older versions, please check [previous releases](https://github.com/appwrite/cursor-plugin.git/releases).**
 
 Appwrite is an open-source backend as a service server that abstracts and simplifies complex and repetitive development tasks behind a very simple to use REST API. Appwrite aims to help you develop your apps faster and in a more secure way. Use the CursorPlugin SDK to integrate your app with the Appwrite server to easily start interacting with all of Appwrite backend APIs and tools. For full API documentation and tutorials go to [https://appwrite.io/docs](https://appwrite.io/docs)
 
@@ -42,7 +42,7 @@ skills/                      # Agent skills (per language)
 commands/                    # Agent-executable commands
 ├── deploy-site.md
 └── deploy-function.md
-.mcp.json                    # MCP server definitions
+.mcp.json                    # Hosted Appwrite MCP server
 ```
 
 ## Skills
@@ -62,12 +62,17 @@ This plugin includes Appwrite SDK skills for the following languages:
 
 Each skill provides comprehensive SDK usage examples including authentication, database operations, file storage, real-time subscriptions, and more.
 
-## MCP Servers
+## Hosted MCP Server
 
-This plugin comes with two MCP (Model Context Protocol) servers pre-configured in `.mcp.json`:
+This plugin configures the hosted Appwrite MCP server at `https://mcp.appwrite.io/`. It gives Cursor access to your Appwrite workspace and projects as well as the latest Appwrite documentation.
 
-- **Appwrite API MCP** — Lets AI agents access the Appwrite API to manage users, databases, storage, and more.
-- **Appwrite Docs MCP** — Access Appwrite documentation inline for quick reference while coding.
+Cursor starts a browser-based OAuth flow when the server first connects. Sign in to Appwrite and approve access; no API key, project ID, endpoint, or other secret needs to be added to `.mcp.json`.
+
+After authentication, try:
+
+> Use Appwrite to show my workspace context and list my projects.
+
+If the server does not connect, open Cursor's MCP settings, restart the `appwrite` server, and complete the sign-in prompt. Clear or reauthenticate the server from the same settings when the OAuth session expires, and inspect Cursor's MCP output logs for connection errors.
 
 ## Commands
 
