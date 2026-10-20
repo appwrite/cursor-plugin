@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.3.0
+
+* Updated: Rewrote the CLI skill as guidance rather than a command catalog, deferring flags to `appwrite &lt;command&gt; --help`
+* Added: `Query` relationship, aggregation, grouping, join and builder examples in every SDK skill
+
 ## 0.2.0
 
 * Breaking: Replaced local `appwrite-api` and `appwrite-docs` MCP servers with the hosted server
