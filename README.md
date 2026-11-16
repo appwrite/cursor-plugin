@@ -35,6 +35,22 @@ The plugin includes Appwrite skills for the following languages and tools:
 
 Each skill gives the agent Appwrite context for authentication, database operations, file storage, realtime subscriptions, functions, and more. Cursor loads a skill when a task matches its description.
 
+## Code review skills
+
+These skills work with Hansi, the reviewer behind Appwrite Review, on GitHub pull requests.
+
+| Skill | What it does |
+| --- | --- |
+| `appwrite-hansi-status` | Read the current tier, open findings, and filtered-out comments. Does not start a review. |
+| `appwrite-hansi-loop` | Fix the pull request until Hansi grades it **Tier S** and no comments are left open. |
+| `appwrite-hansi-learn` | Reply on a finding with a lasting rule so Hansi remembers it. |
+| `appwrite-hansi-setup` | Write `.hansi.json` and open a pull request onto the base branch. |
+| `appwrite-hansi-threads` | Applies on its own: do not resolve Hansi's review threads. |
+
+The `hansi-threads` rule says the same for every chat: Hansi clears its threads itself after a fix or a dismissal.
+
+The review skills need Appwrite Review set up on the repository (Console → your project → Review) and a way to talk to GitHub; the examples use the GitHub CLI. Each review counts toward the project's review usage, and `hansi-loop` stops after 5 iterations.
+
 ## Commands
 
 Agent-executable commands for deploying from your editor:
@@ -80,8 +96,20 @@ skills/                      # Agent skills
 │   └── SKILL.md
 ├── appwrite-dotnet/
 │   └── SKILL.md
-└── appwrite-cli/
+├── appwrite-cli/
+│   └── SKILL.md
+├── appwrite-hansi-status/
+│   └── SKILL.md
+├── appwrite-hansi-loop/
+│   └── SKILL.md
+├── appwrite-hansi-learn/
+│   └── SKILL.md
+├── appwrite-hansi-setup/
+│   └── SKILL.md
+└── appwrite-hansi-threads/
     └── SKILL.md
+rules/                       # Always-applied rules
+└── hansi-threads.mdc
 commands/                    # Agent-executable commands
 ├── deploy-site.md
 └── deploy-function.md
