@@ -35,6 +35,22 @@ The plugin includes Appwrite skills for the following languages and tools:
 
 Each skill gives the agent Appwrite context for authentication, database operations, file storage, realtime subscriptions, functions, and more. Cursor loads a skill when a task matches its description.
 
+## Code review skills
+
+These skills work with Appwrite Review, which reviews GitHub pull requests and grades them from **S** to **F**.
+
+| Skill | What it does |
+| --- | --- |
+| `appwrite-review-status` | Read the current tier, open findings, and filtered-out comments. Does not start a review. |
+| `appwrite-review-loop` | Fix the pull request until Appwrite Review grades it **Tier S** and no comments are left open. |
+| `appwrite-review-learn` | Reply on a finding with a lasting rule so Appwrite Review remembers it. |
+| `appwrite-review-setup` | Write `.hansi.json` and open a pull request onto the base branch. |
+| `appwrite-review-threads` | Applies on its own: do not resolve Appwrite Review's threads. |
+
+The `review-threads` rule says the same for every chat: Appwrite Review clears its threads itself after a fix or a dismissal.
+
+The review skills need Appwrite Review set up on the repository (Console → your project → Review) and a way to talk to GitHub; the examples use the GitHub CLI. Each review counts toward the project's review usage, and `review-loop` stops after 5 iterations.
+
 ## Commands
 
 Agent-executable commands for deploying from your editor:
@@ -80,8 +96,20 @@ skills/                      # Agent skills
 │   └── SKILL.md
 ├── appwrite-dotnet/
 │   └── SKILL.md
-└── appwrite-cli/
+├── appwrite-cli/
+│   └── SKILL.md
+├── appwrite-review-status/
+│   └── SKILL.md
+├── appwrite-review-loop/
+│   └── SKILL.md
+├── appwrite-review-learn/
+│   └── SKILL.md
+├── appwrite-review-setup/
+│   └── SKILL.md
+└── appwrite-review-threads/
     └── SKILL.md
+rules/                       # Always-applied rules
+└── review-threads.mdc
 commands/                    # Agent-executable commands
 ├── deploy-site.md
 └── deploy-function.md
