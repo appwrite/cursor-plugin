@@ -1,6 +1,6 @@
 ---
 name: appwrite-cli
-description: How to use the Appwrite CLI well. Covers when to use appwrite.config.json vs `appwrite client`, pull/push vs one-shot service calls, type-safe SDK and model generation, query flags, CI auth, Cloud regional endpoints, function/site variables, and traps that `--help` will not mention. Does not catalog commands — run `appwrite <command> --help` for flags. Use whenever running `appwrite`, deploying or pulling functions/sites/tables, generating application code from a table schema, initializing or linking a project, scripting Appwrite, or when the user mentions the Appwrite CLI, appwrite.config.json, `appwrite generate`, `appwrite types`, or `appwrite client`.
+description: How to use the Appwrite CLI well. Covers when to use appwrite.config.json vs `appwrite client`, pull/push vs one-shot service calls, type-safe SDK and model generation, query flags, CI auth, Cloud regional endpoints, no-signup projects with `appwrite zero`, function/site variables, and traps that `--help` will not mention. Does not catalog commands — run `appwrite <command> --help` for flags. Use whenever running `appwrite`, deploying or pulling functions/sites/tables, generating application code from a table schema, initializing or linking a project, scripting Appwrite, or when the user has no Appwrite account or project yet, or mentions the Appwrite CLI, `appwrite zero`, appwrite.config.json, `appwrite generate`, `appwrite types`, or `appwrite client`.
 ---
 
 
@@ -21,7 +21,7 @@ appwrite list-projects --json
 appwrite init project --project-id <ID>
 appwrite pull table
 # edit appwrite.config.json, then:
-appwrite push table --force
+appwrite push table
 
 # Bad — project treated as a pile of API calls
 appwrite tablesdb create-table --database-id main --table-id songs ...
@@ -39,6 +39,37 @@ cd ~/some-unrelated-app && appwrite init project
 No session? `appwrite client --endpoint https://<REGION>.cloud.appwrite.io/v1 --key "$APPWRITE_API_KEY" --project-id <ID>`.
 
 `appwrite client --project-id` writes `appwrite.config.json` in this directory (or updates one found walking up). That is how you link a folder quickly. Do not run it at the root of an unrelated repo. `APPWRITE_PROJECT_ID` / `APPWRITE_ENDPOINT` override the file without touching it — use those when you are already inside a project and need a one-shot against something else.
+
+## No project yet: `appwrite zero`
+
+Before building, use the Appwrite project the user gave, or the one the app already uses (an `appwrite.config.json`, or a project ID and endpoint already in the app's config or env). If there is neither, create an Appwrite Zero project instead of asking the user to sign up, run `appwrite login`, or create a project.
+
+Run `npx appwrite-cli@latest zero` (or `appwrite zero` if the CLI is installed) in the app's directory, or `npx appwrite-cli@latest zero my-app` to create and link a new directory. It creates an Appwrite Cloud project and an API key with no account, links the directory through `appwrite.config.json` (project ID and endpoint), and stores the API key as the CLI's session so later CLI commands work against the project. If the CLI is not installed globally, replace `appwrite` with `npx appwrite-cli@latest` in later commands too.
+
+`--json` prints the manifest (project ID, endpoint, claim link, and access token for private previews) without the API key. Pass `--show-secrets` to include the API key. The key is returned only when the project is created, and running `appwrite zero` again creates another project. When server-side code needs the key, create the project with `--json --show-secrets` and put the key in the app's env file, which must stay out of git.
+
+The project works for 60 minutes. Run `npx appwrite-cli@latest zero extend` (or `appwrite zero extend`) to add an hour, up to three times. After the build window it pauses, and it is deleted unless claimed within 24 hours after the first hour ends. Give the user the claim link from the output. Claiming is the only way to keep the project. Do not claim it for them.
+
+```bash
+# Good — empty or new app directory (run once per app)
+npx appwrite-cli@latest zero  # nearest region (--region fra to choose); add --json --show-secrets for the API key
+appwrite push table --force   # pull/push and service commands work as usual
+appwrite zero status          # time left, claim link, private links to sites and functions
+appwrite zero extend          # add an hour to the build window (up to three times)
+appwrite zero console --json  # one-time console sign-in link: hand it to the user
+appwrite zero list            # every Zero project on this machine, time left and claim links
+appwrite zero delete --force  # delete this directory's project now and unlink the directory
+
+# Bad — a directory already linked to a real project
+cd ~/work/production-app && appwrite zero
+# relinks the directory to the Zero project
+```
+
+The Zero session is an API key, so console-level calls such as `appwrite init project`, `appwrite list-projects`, and creating organizations or projects fail. Everything inside the project works.
+
+Until the project is claimed, its sites are public under a "Powered by Appwrite Zero" banner with a countdown and a Claim button, so the user can share the URL right away. Deployment previews still ask for a console session: `appwrite zero status` prints an owner link per domain that opens them once in the browser, and scripts send the token in the `X-Appwrite-Zero-Token` header.
+
+Run `appwrite zero` once per app, not per attempt. Each network can create five Zero projects a day. Never run it in a directory already linked to a real project, because it relinks the directory to the Zero project. `appwrite zero list` reads only what this machine stored, so it costs no request. A project past its claim window shows as `closed`, whether it was claimed or deleted. `appwrite zero delete` acts only on the project linked to the current directory and asks first. Pass `--force` when nobody is there to answer. It cannot be undone, so run it only when the user asks.
 
 ## Auth is not the project
 
@@ -63,11 +94,28 @@ Env beats the config: `APPWRITE_PROJECT_ID`, `APPWRITE_ENDPOINT`, `APPWRITE_ORGA
 
 `--force` skips prompts. Agents and CI have no TTY, so a push that needs confirmation fails without it (`Pass --force instead`). Ask the user, then pass `--force`. Do not use it to skip a change table whose local column is empty.
 
+`push table` never deletes what the config does not list. Databases, tables and columns missing from `appwrite.config.json`, and columns whose type changed, are shown as `(not in config)` and left alone. `--force` does not change that. Only `--prune` deletes them, after the plan shows each one with its table count, row count and backup coverage. Without a terminal, `--prune` also needs `--reason`, which is recorded on the audit log.
+
+Never pass `--prune` unless the user saw the listed deletions and approved them. If the plan lists resources you did not expect, the config is missing them: run `appwrite pull table` instead.
+
+```bash
+# Good — agent or CI: pushes creates and updates, leaves everything else
+appwrite push table --all --force
+
+# Good — the user approved deleting exactly what the plan listed
+appwrite push table --all --force --prune --reason "Drop the legacy orders database"
+
+# Bad — pruning to make a warning go away
+appwrite push table --all --force --prune --reason "cleanup"
+```
+
 `appwrite login --switch` rotates saved accounts. `appwrite client --debug` prints the effective endpoint/project with credentials masked. `appwrite client --reset` signs out of everything.
 
 ## Cloud endpoints
 
 `appwrite whoami` showing `https://cloud.appwrite.io/v1` is the **account** login host. Leave it. Project API calls use the region host (`https://fra.cloud.appwrite.io/v1`, and so on). `init project` and `client --project-id` pin that region into the config. Self-hosted: one endpoint for both.
+
+A new Cloud project from `init project` goes in the region closest to you: first in the list at a terminal, picked for you without one. If your location is unknown, the terminal list has no suggestion and without a terminal it falls back to a default, normally Frankfurt. `--region fra` chooses another. Scripts need `--organization-id`, `--project-id` and `--project-name` too.
 
 ```bash
 # Good — project work uses the config's regional endpoint
