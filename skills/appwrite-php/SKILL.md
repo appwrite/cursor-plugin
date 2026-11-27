@@ -12,6 +12,20 @@ description: Appwrite PHP SDK skill. Use when building server-side PHP applicati
 composer require appwrite/appwrite
 ```
 
+## Project Setup
+
+Before building, use the Appwrite project the user gave, or the one the app already uses (an `appwrite.config.json`, or a project ID and endpoint already in the app's config or env). If there is neither, create an Appwrite Zero project instead of asking the user to sign up or create a project.
+
+```bash
+npx appwrite-cli@latest zero --json --show-secrets
+```
+
+Run this command once in the app's directory, or pass a directory name (`npx appwrite-cli@latest zero my-app --json --show-secrets`) to create and link a new directory. The command creates an Appwrite Cloud project and an API key with no account. It links the directory through `appwrite.config.json` (project ID and endpoint) and stores the API key as the CLI's session so later CLI commands work against the project. Put the API key from the JSON output in the app's env file and keep that file out of git. `--json` prints the manifest without the API key unless you pass `--show-secrets`, and the key is returned only when the project is created.
+
+- **Time limits and claiming:** The project works for 60 minutes. Run `npx appwrite-cli@latest zero extend` (or `appwrite zero extend` if the CLI is installed) to add an hour, up to three times. After the build window it pauses, and it is deleted unless claimed within 24 hours after the first hour ends. Give the user the claim link from the output. Claiming is the only way to keep the project. Do not claim it for them.
+- **Limits and safety:** Run `npx appwrite-cli@latest zero` once per app, not per attempt. Running it again creates another project, and each network can create five Zero projects a day. Never run it in a directory already linked to a real project, because it relinks the directory to the Zero project.
+- **CLI scope:** The Zero session is an API key, so console-level calls such as `appwrite init project` and `appwrite list-projects` fail. Everything inside the project works.
+
 ## Setting Up the Client
 
 ```php
@@ -352,7 +366,7 @@ setcookie('a_session_[PROJECT_ID]', $session['secret'], [
 
 > **Cookie security:** Always use `httpOnly`, `secure`, and `sameSite: 'strict'` to prevent XSS. The cookie name must be `a_session_<PROJECT_ID>`.
 
-> **Forwarding user agent:** Call `$sessionClient->setForwardedUserAgent($_SERVER['HTTP_USER_AGENT'])` to record the end-user's browser info for debugging and security.
+> **Forwarding user agent:** To record the end user's browser on their session, sign them in with an admin client created inside the request handler (same endpoint, project and API key as above) and call `$adminClient->setForwardedUserAgent($_SERVER['HTTP_USER_AGENT'])` on it first. Don't set it on the shared admin client, where it would carry over to other users' requests, or on the session client, where it does nothing: the value only takes effect with an API key.
 
 ## Error Handling
 
